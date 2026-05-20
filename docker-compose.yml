@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: fintech-db
+    environment:
+      POSTGRES_USER: fintech_user
+      POSTGRES_PASSWORD: fintech_password
+      POSTGRES_DB: fintech_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  fintech-app:
+    build: .
+    container_name: fintech-app
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - DATABASE_URL=postgresql://fintech_user:fintech_password@db:5432/fintech_db
+      - API_KEY=test-key-12345
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  db_data:
